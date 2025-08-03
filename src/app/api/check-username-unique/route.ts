@@ -17,7 +17,6 @@ import { usernameValidation } from "@/schemas/signUpSchema";
             username: searchParams.get("username")
         }
 
-        // Validate the query parameter
         const result = UsernameQuerySchema.safeParse(queryParam);
 
         if(!result.success) {
