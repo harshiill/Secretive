@@ -1,4 +1,4 @@
-import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import { sendEmail } from "@/helpers/mailer";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/user.model";
 import bcrypt from "bcryptjs";
@@ -87,13 +87,18 @@ export async function POST(request : Request)
         }
 
         //send verification email
-        const emailResponse = await sendVerificationEmail(email, username, verifyCode);
+        const emailResponse = await sendEmail({
+            email,
+            emailType: "verify",
+            username,
+            otp: verifyCode
+        });
 
-        if(!emailResponse.success)
+        if (!emailResponse.accepted || emailResponse.accepted.length === 0)
         {
             return Response.json({
                 success: false,
-                message: emailResponse.message
+                message: "Failed to send verification email."
             },{
                 status: 500
             })
