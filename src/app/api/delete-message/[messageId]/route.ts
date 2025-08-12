@@ -7,10 +7,11 @@ import { getServerSession } from "next-auth";
 import mongoose from "mongoose";
 
 
-export async function DELETE(req : NextRequest,{params} : {params: {messageId: string}})
+export async function DELETE(req : NextRequest,context: { params: { messageId: string } })
 {
-    const messageId = params.messageId;
-    await dbConnect();
+    const { messageId } = context.params;
+   
+ await dbConnect();
     const session = await getServerSession(authOptions);
     const user = session?.user;
 
