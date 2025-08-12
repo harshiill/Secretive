@@ -22,6 +22,8 @@ export const authOptions : NextAuthOptions = {
                 email: credentials.identifier
             })
 
+            console.log("Found user in authorize:", user);
+
             if(!user)
             {
                 throw new Error("No user found with the provided email.");
@@ -39,6 +41,7 @@ export const authOptions : NextAuthOptions = {
                 throw new Error("Incorrect password. Please try again.");
             }
 
+            console.log("Returning user:", user);
             return user;
 
         } catch (error : any) {
@@ -51,22 +54,25 @@ export const authOptions : NextAuthOptions = {
     ],
     callbacks:{
     async session({ session ,token }) {
+        console.log("Session callback - token:", token);
         if(token) {
             session.user._id = token._id as string;
             session.user.username = token.username as string | undefined;
             session.user.isVerified = token.isVerified as boolean | undefined;
             session.user.isAcceptingMessages = token.isAcceptingMessages as boolean | undefined;
         }
-
+        console.log("Session callback - session after setting:", session);
       return session
     },
     async jwt({ token, user }) {
         if(user)
         {
-            token.id = user._id?.toString();
+            console.log("JWT callback - user:", user);
+            token._id = user._id?.toString();
             token.username = user.username;
             token.isVerified = user.isVerified;
             token.isAcceptingMessages = user.isAcceptingMessages;
+            console.log("JWT callback - token after setting:", token);
         }
       return token;
     }

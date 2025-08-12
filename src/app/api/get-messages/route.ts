@@ -61,6 +61,10 @@ export async function GET(req : NextRequest)
             messages: user[0].messages
         }, {status: 200});
     } catch (error) {
-        
+        console.error("Error in get-messages route:", error);
+        return NextResponse.json({
+            success: false,
+            message: "An error occurred while fetching messages."
+        }, {status: 500});
     }
 }

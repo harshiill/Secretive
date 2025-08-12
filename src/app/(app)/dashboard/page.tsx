@@ -21,14 +21,17 @@ function Dashboard() {
     const [messages,setMessages] = useState<Message[]>([])
     const [isLoading,setIsLoading] = useState<boolean>(false)
     const [isSwitchLoading,setIsSwitchLoading] = useState<boolean>(false)
-    const handleDeleteMessage=(messageId : string) => {
-    setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
-}
+    const handleDeleteMessage = (messageId: string) => {
+    setMessages(messages.filter((message) => message._id !== messageId));
+  };
 
 const {data : session} = useSession();
 
 const form= useForm({
-    resolver: zodResolver(AcceptMessageSchema)
+    resolver: zodResolver(AcceptMessageSchema),
+    defaultValues: {
+    acceptMessages: false
+  }
 }
 )
 
@@ -41,7 +44,7 @@ const fetchAcceptMessages = useCallback(async () => {
 
     try {
         const res=await axios.get<ApiResponse>('/api/accept-message')
-        setValue('acceptMessages',res.data.isAcceptingMessages ? true : false)
+        setValue('acceptMessages', res.data.isAcceptingMessages ?? false);        
         toast.success(res.data.message)
     } catch (error) {
         const axiosError = error as AxiosError<ApiResponse>;
@@ -57,7 +60,7 @@ const fetchMessages= useCallback(async (refresh : boolean =false) => {
     setIsSwitchLoading(false   )
 
     try {
-        const res=await axios.get<ApiResponse>('/api/messages')
+        const res=await axios.get<ApiResponse>('/api/get-messages')
         setMessages(res.data.messages || [])
 
         if(refresh) {
@@ -73,19 +76,29 @@ const fetchMessages= useCallback(async (refresh : boolean =false) => {
 },[setIsLoading,setMessages])
 
 useEffect(() => {
-    if(!session || !session.user) return
+    if(!session || !session.user) {
+        console.log("No session or user found");
+        return;
+    }
 
+    console.log("Session user:", session.user);
     fetchAcceptMessages()
     fetchMessages()
 },[session,setValue,fetchAcceptMessages,fetchMessages])
 
 const handleSwitchChange = async () => {
+    setIsSwitchLoading(true);
     try {
-        await axios.post('/api/accept-message', { acceptMessages: !acceptMessages });
+        const response = await axios.post<ApiResponse>('/api/accept-message', {
+            acceptMessages: !acceptMessages,
+        });
         setValue('acceptMessages', !acceptMessages);
+        toast.success(response.data.message || 'Message acceptance setting updated successfully');
     } catch (error) {
-       const axiosError = error as AxiosError<ApiResponse>;
-        toast.error(axiosError.response?.data.message || 'An error occurred');
+        const axiosError = error as AxiosError<ApiResponse>;
+        toast.error(axiosError.response?.data.message || 'An error occurred while updating settings');
+    } finally {
+        setIsSwitchLoading(false);
     }
 }
 
