@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/user.model";
@@ -7,10 +8,9 @@ import { getServerSession } from "next-auth";
 import mongoose from "mongoose";
 
 
-export async function DELETE(req : NextRequest,context: { params: { messageId: string } })
+export async function DELETE(req : NextRequest,context: any)
 {
-    const { messageId } = context.params;
-   
+const messageId = context.params.messageId;   
  await dbConnect();
     const session = await getServerSession(authOptions);
     const user = session?.user;
