@@ -30,6 +30,14 @@ function Navbar() {
             <span>
               Welcome, {user.username ?? user.name ?? user.email}
             </span>
+            <Link href="/dashboard">
+              <Button
+                className="w-full md:w-auto bg-blue-600 text-white"
+                variant="default"
+              >
+                Dashboard
+              </Button>
+            </Link>
             <Button
               onClick={onLogout}
               className="w-full md:w-auto bg-slate-100 text-black"
@@ -39,14 +47,25 @@ function Navbar() {
             </Button>
           </div>
         ) : (
-          <Link href="/sign-in">
-            <Button
-              className="w-full md:w-auto bg-slate-100 text-black"
-              variant="outline"
-            >
-              Login
-            </Button>
-          </Link>
+          <>
+            <Link href="/sign-in">
+              <Button
+                className="w-full md:w-auto bg-slate-100 text-black"
+                variant="outline"
+              >
+                Login
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button
+                className="w-full md:w-auto bg-slate-100 text-black"
+                variant="outline"
+              >
+                Signup
+              </Button>
+            </Link>
+          </>
+          
         )}
       </div>
     </nav>

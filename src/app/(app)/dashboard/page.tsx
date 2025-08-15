@@ -25,7 +25,7 @@ function Dashboard() {
     setMessages(messages.filter((message) => message._id !== messageId));
   };
 
-const {data : session} = useSession();
+const {data : session, status} = useSession();
 
 const form= useForm({
     resolver: zodResolver(AcceptMessageSchema),
@@ -102,9 +102,28 @@ const handleSwitchChange = async () => {
     }
 }
 
-if(!session || !session.user)
-{
-    return <div>Please Login </div>
+// Show loading while session is being fetched
+if(status === 'loading') {
+    return (
+        <div className="flex justify-center items-center min-h-screen">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Loading...</span>
+        </div>
+    )
+}
+
+// Redirect to login if no session (this should be handled by middleware, but just in case)
+if(status === 'unauthenticated' || !session || !session.user) {
+    return (
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-4">Please Login</h2>
+                <Button onClick={() => window.location.href = '/sign-in'}>
+                    Go to Login
+                </Button>
+            </div>
+        </div>
+    )
 }
 
 const { username } = session.user as User;
